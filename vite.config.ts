@@ -1,11 +1,12 @@
-// vite.config.ts
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-
-// Reemplaza con tu usuario y repo de GitHub
-const repoName = "docagilsw";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';  // Para resolver alias
 
 export default defineConfig({
   plugins: [react()],
-  base: `/${repoName}/`,
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),  // ← Esto hace que @ funcione en runtime
+    },
+  },
 });

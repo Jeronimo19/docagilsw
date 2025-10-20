@@ -1,18 +1,34 @@
-// src/App.tsx
-import { Routes, Route } from 'react-router-dom';
-import Landing from './pages/Landing';    // Línea 3: Path correcto
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';        // Línea 5: Path correcto (cambia de '../' a './')
-import Registro from './pages/Register';  // ← NUEVO: Import para Registro
+import Login from './pages/Login';
+import Registro from './pages/Register';  // Línea 5: Asegúrate de que el archivo exista
+
+// Hook simple de auth (usa localStorage para ejemplo)
+const useAuth = () => {
+  const isLoggedIn = localStorage.getItem('token') !== null;  // Ejemplo básico, expándelo con tu API
+  return { isLoggedIn };
+};
 
 function App() {
+  const { isLoggedIn } = useAuth();
+
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/registro" element={<Registro />} />  // Línea 13: Ahora resuelto
-      <Route path="*" element={<Landing />} />  {/* Fallback */}
+      <Route path="/registro" element={<Registro />} />
+      <Route
+        path="/dashboard"
+        element={
+          isLoggedIn ? (
+            <Dashboard />
+          ) : (
+            <Navigate to="/login" replace />  // Línea ~23: Fix syntax - paréntesis claros + 'replace' para clean URL
+          )
+        }
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />  {/* Fallback a Landing */}
     </Routes>
   );
 }
