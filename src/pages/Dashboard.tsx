@@ -1,16 +1,12 @@
-// src/pages/Landing.tsx - Versión actualizada con shadcn/ui para prueba
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import React from 'react'
+import { Link } from 'react-router-dom' // Assuming you're using React Router for navigation; if not, replace with <a> tags
 
-export default function Landing() {
+export default function DocFlowLanding() {
   const teamMembers = [
     { name: "Abram Ortiz Martínez", initials: "AO" },
     { name: "José Jerónimo Medrano Flores", initials: "JM" },
     { name: "Jesús Abdiel Chapa Cruz", initials: "JC" },
-  ];
+  ] 
 
   const projectSections = [
     {
@@ -55,7 +51,7 @@ export default function Landing() {
       description:
         "Requerimientos clasificados por criticidad e impacto, priorizados según viabilidad técnica y dependencias.",
     },
-  ];
+  ]
 
   return (
     <div className="min-h-screen bg-white">
@@ -70,21 +66,18 @@ export default function Landing() {
           </p>
           <div className="flex justify-center gap-4">
             <Link to="/registro">
-              <Button
-                size="lg"
-                className="animate-pulse bg-[#3B82F6] px-10 py-7 text-xl font-semibold text-white shadow-lg transition-all hover:bg-[#10B981] hover:shadow-xl"
+              <button
+                className="animate-pulse bg-[#3B82F6] px-10 py-7 text-xl font-semibold text-white shadow-lg transition-all hover:bg-[#10B981] hover:shadow-xl rounded-md"
               >
                 Registrar Gratis
-              </Button>
+              </button>
             </Link>
-            <Link to="/login">
-              <Button
-                size="lg"
-                variant="outline"
-                className="px-10 py-7 text-xl font-semibold text-[#3B82F6] border-[#3B82F6] hover:bg-[#3B82F6] hover:text-white"
+            <Link to="/registro">
+              <button
+                className="px-10 py-7 text-xl font-semibold text-[#3B82F6] border-2 border-[#3B82F6] hover:bg-[#3B82F6] hover:text-white transition-all rounded-md"
               >
                 Iniciar Sesión
-              </Button>
+              </button>
             </Link>
           </div>
         </div>
@@ -97,11 +90,9 @@ export default function Landing() {
           <div className="flex flex-wrap justify-center gap-8">
             {teamMembers.map((member, index) => (
               <div key={index} className="flex flex-col items-center gap-3 text-center">
-                <Avatar className="h-28 w-28 bg-[#3B82F6] shadow-lg">
-                  <AvatarFallback className="text-2xl font-bold text-white">
-                    {member.initials}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="h-28 w-28 bg-[#3B82F6] rounded-full shadow-lg flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">{member.initials}</span>
+                </div>
                 <p className="font-semibold text-gray-800">{member.name}</p>
               </div>
             ))}
@@ -115,17 +106,17 @@ export default function Landing() {
           <h2 className="mb-12 text-center text-4xl font-bold text-[#10B981]">Índice del Proyecto</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {projectSections.map((section, index) => (
-              <Card
+              <div
                 key={section.id}
-                className="animate-in fade-in bg-[#3B82F6] shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+                className="animate-in fade-in bg-[#3B82F6] shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl rounded-lg"
                 style={{ animationDelay: `${index * 100}ms` } as React.CSSProperties}
               >
-                <CardContent className="p-6">
+                <div className="p-6">
                   <div className="mb-4 text-5xl">{section.icon}</div>
                   <h3 className="mb-3 text-xl font-bold text-[#10B981]">{section.title}</h3>
                   <p className="leading-relaxed text-white">{section.description}</p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -135,21 +126,18 @@ export default function Landing() {
       <section className="px-6 py-16">
         <div className="mx-auto max-w-6xl text-center">
           <Link to="/login">
-            <Button
-              size="lg"
-              className="animate-pulse bg-[#3B82F6] px-12 py-8 text-2xl font-bold text-white shadow-2xl transition-all hover:scale-110 hover:bg-[#10B981]"
+            <button
+              className="animate-pulse bg-[#3B82F6] px-12 py-8 text-2xl font-bold text-white shadow-2xl transition-all hover:scale-110 hover:bg-[#10B981] rounded-md"
             >
               Iniciar Sesión
-            </Button>
+            </button>
           </Link>
           <Link to="/registro" className="ml-4">
-            <Button
-              size="lg"
-              variant="outline"
-              className="px-12 py-8 text-2xl font-bold text-[#3B82F6] border-[#3B82F6] hover:bg-[#3B82F6] hover:text-white"
+            <button
+              className="px-12 py-8 text-2xl font-bold text-[#3B82F6] border-2 border-[#3B82F6] hover:bg-[#3B82F6] hover:text-white transition-all rounded-md"
             >
               Registrar Gratis
-            </Button>
+            </button>
           </Link>
         </div>
       </section>
@@ -176,5 +164,5 @@ export default function Landing() {
         </div>
       </footer>
     </div>
-  );
+  )
 }
