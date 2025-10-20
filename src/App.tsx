@@ -8,7 +8,7 @@ import Registro from './pages/Register';  // ← NUEVO: Import para Registro
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Landing />} />
+      <Route path="/" element={<Dashboard />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Registro />} />  // Línea 13: Ahora resuelto
