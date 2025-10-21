@@ -293,24 +293,24 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="px-6 py-12">
-        <div className="mx-auto max-w-6xl">
-          <h2 className="mb-8 text-center text-3xl font-bold text-[#10B981]">Equipo de Desarrollo:</h2>
-          <div className="flex flex-wrap justify-center gap-8">
-            {teamMembers.map((member, index) => (
-              <div key={index} className="flex flex-col items-center gap-3 text-center">
-                <Avatar className="h-28 w-28 bg-[#3B82F6] shadow-lg">
-                  <AvatarFallback className="text-2xl font-bold text-white">
-                    {member.initials}
-                  </AvatarFallback>
-                </Avatar>
-                <p className="font-semibold text-gray-800">{member.name}</p>
-              </div>
-            ))}
-          </div>
+{/* Team Section */}
+<section className="px-6 py-12">
+  <div className="mx-auto max-w-6xl">
+    <h2 className="mb-8 text-center text-3xl font-bold text-[#10B981]">Equipo de Desarrollo:</h2>
+    <div className="flex flex-wrap justify-center gap-8">
+      {teamMembers.map((member, index) => (
+        <div key={index} className="flex flex-col items-center gap-3 text-center">
+          <Avatar className="h-28 w-28 bg-[#3B82F6] shadow-lg">
+            <AvatarFallback className="text-2xl font-bold text-white">
+              {member.initials}
+            </AvatarFallback>
+          </Avatar>
+          <p className="font-semibold text-white">{member.name}</p> {/* ¡Aquí el cambio: text-white! */}
         </div>
-      </section>
+      ))}
+    </div>
+  </div>
+</section>
 
       {/* Project Index Section */}
       <section className="px-6 py-16">
