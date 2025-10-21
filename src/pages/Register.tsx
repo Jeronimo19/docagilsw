@@ -1,66 +1,148 @@
-// src/pages/Register.tsx - Fixado
-import { useState } from 'react';  // ← Solo hooks si los usás (valor, no tipo)
-import { Link, useNavigate } from 'react-router-dom';
-import type { ChangeEvent, FormEvent } from 'react';  // ← ¡ÉSTE ES EL FIX! Type-only import para los eventos
+import React, { useState } from "react";
+import { Link } from "react-router-dom";  // ← Cambiado: React Router
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { UserPlus, ArrowLeft } from "lucide-react";  // ← Icons
 
-export default function Registro() {  // O 'Register' si lo cambiaste
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-  const navigate = useNavigate();
+export default function Registro() {  // ← Nombre simple pa' React
+  const [nombre, setNombre] = useState("");
+  const [email, setEmail] = useState("");
+  const [departamento, setDepartamento] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {  // ← Ahora tipado bien
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e: FormEvent) => {  // ← Ahora tipado bien
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Lógica de registro (e.g., API)
-    console.log('Registro:', formData);
-    navigate('/login');  // Redirige a login después
+
+    // Validar email institucional
+    const institutionalDomains = ["empresa.com", "docflow.com", "institucion.edu"];
+    const domain = email.split("@")[1];
+
+    if (!institutionalDomains.includes(domain)) {
+      alert("Por favor usa un correo institucional válido");
+      return;
+    }
+
+    // Simular envío de solicitud al administrador
+    setSubmitted(true);
   };
+
+  if (submitted) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white px-4">
+        <Card className="w-full max-w-md shadow-xl">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+              <UserPlus className="h-8 w-8 text-[#10B981]" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-[#10B981]">Solicitud Enviada</CardTitle>
+            <CardDescription className="text-base">
+              Tu solicitud de registro ha sido enviada al administrador para su aprobación
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="rounded-lg bg-blue-50 p-4">
+              <p className="text-sm text-[#3B82F6]">
+                Recibirás un correo electrónico cuando tu cuenta sea aprobada. Esto puede tomar de 1 a 2 días hábiles.
+              </p>
+            </div>
+            <Link to="/login">  {/* ← Cambiado: to= en vez de href= */}
+              <Button className="w-full bg-[#3B82F6] hover:bg-[#2563EB]">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Volver al Login
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-3xl font-bold mb-6 text-center text-[#10B981]">Registro Gratis</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            name="name"
-            placeholder="Nombre completo"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#10B981]"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#10B981]"
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Contraseña"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#10B981]"
-            required
-          />
-          <button
-            type="submit"
-            className="w-full bg-[#10B981] text-white py-3 rounded-md font-semibold hover:bg-[#3B82F6] transition-all"
-          >
-            Registrarse
-          </button>
-        </form>
-        <p className="mt-4 text-center text-gray-600">
-          ¿Ya tienes cuenta? <Link to="/login" className="text-[#3B82F6] font-semibold hover:underline">Inicia sesión</Link>
-        </p>
-      </div>
+    <div className="flex min-h-screen items-center justify-center bg-white px-4">
+      <Card className="w-full max-w-md shadow-xl">
+        <CardHeader className="space-y-2 text-center">
+          <CardTitle className="text-3xl font-bold text-[#10B981]">Solicitar Cuenta</CardTitle>
+          <CardDescription className="text-base text-gray-600">
+            Completa el formulario para solicitar acceso a DocFlow
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="nombre" className="text-base font-medium">
+                Nombre Completo
+              </Label>
+              <Input
+                id="nombre"
+                type="text"
+                placeholder="Juan Pérez García"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                required
+                className="h-11 border-gray-300 focus:border-[#3B82F6] focus:ring-[#3B82F6]"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-base font-medium">
+                Correo Electrónico Institucional
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="juan.perez@empresa.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="h-11 border-gray-300 focus:border-[#3B82F6] focus:ring-[#3B82F6]"
+              />
+              <p className="text-xs text-gray-500">Debe ser un correo institucional válido</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="departamento" className="text-base font-medium">
+                Departamento
+              </Label>
+              <Select value={departamento} onValueChange={setDepartamento} required>
+                <SelectTrigger className="h-11">
+                  <SelectValue placeholder="Selecciona tu departamento" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recursos-humanos">Recursos Humanos</SelectItem>
+                  <SelectItem value="finanzas">Finanzas</SelectItem>
+                  <SelectItem value="operaciones">Operaciones</SelectItem>
+                  <SelectItem value="ti">Tecnología de la Información</SelectItem>
+                  <SelectItem value="ventas">Ventas</SelectItem>
+                  <SelectItem value="marketing">Marketing</SelectItem>
+                  <SelectItem value="legal">Legal</SelectItem>
+                  <SelectItem value="otro">Otro</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button
+              type="submit"
+              className="h-11 w-full bg-[#10B981] text-base font-semibold text-white transition-all hover:bg-[#059669] hover:shadow-lg"
+            >
+              <UserPlus className="mr-2 h-5 w-5" />
+              Enviar Solicitud
+            </Button>
+            <div className="text-center">
+              <Link 
+                to="/login"  // ← Cambiado: to= en vez de href=
+                className="text-sm font-medium text-[#3B82F6] hover:text-[#2563EB] hover:underline"
+              >
+                ¿Ya tienes cuenta? Inicia sesión
+              </Link>
+            </div>
+          </form>
+          <div className="mt-8 border-t pt-6">
+            <p className="text-center text-xs text-gray-500">
+              Desarrollado por Abram Ortiz Martínez, José Jerónimo Medrano Flores, Jesús Abdiel Chapa Cruz
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
