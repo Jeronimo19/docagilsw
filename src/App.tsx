@@ -9,6 +9,7 @@ import AuditorPanel from './components/roles/AuditorPanel';
 import AdministradorPanel from './components/roles/AdministradorPanel';
 import MiCuenta from './pages/profile/MiCuenta';
 
+
 // Hook básico de auth (usa localStorage pa' ejemplo – expándelo con tu API después)
 const useAuth = () => {
   const isLoggedIn = localStorage.getItem('token') !== null;  // Ej: después de login, set 'token'
