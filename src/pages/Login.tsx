@@ -1,19 +1,21 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";  // ← Cambiado: React Router en vez de Next
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Shield, FileText, CheckCircle2, Lock } from "lucide-react";  // ← Icons, instala si no tenés
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Shield, FileText, CheckCircle2, Lock } from "lucide-react";
 
-export default function Login() {  // ← Nombre simple pa' React
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [selectedRole, setSelectedRole] = useState("solicitante");  // ← NUEVO: Selector de rol default
   const [mfaEnabled, setMfaEnabled] = useState(false);
   const [mfaCode, setMfaCode] = useState("");
   const [showMfa, setShowMfa] = useState(false);
-  const navigate = useNavigate();  // ← Nuevo: Pa' redirects suaves
+  const navigate = useNavigate();
 
   const isInstitutionalEmail = (email: string) => {
     const institutionalDomains = ["empresa.com", "docflow.com", "institucion.edu"];
@@ -41,23 +43,26 @@ export default function Login() {  // ← Nombre simple pa' React
       }
     }
 
-    // Simulación de login - en producción conectar con backend
-    // ← Cambiado: useNavigate en vez de window.location
-    if (email.includes("solicitante")) {
-      localStorage.setItem("token", "fake-token");  // Simula login exitoso
-      navigate("/solicitante");  // O /dashboard si lo cambias
-    } else if (email.includes("aprobador")) {
-      localStorage.setItem("token", "fake-token");
-      navigate("/aprobador");
-    } else if (email.includes("auditor")) {
-      localStorage.setItem("token", "fake-token");
-      navigate("/auditor");
-    } else if (email.includes("admin")) {
-      localStorage.setItem("token", "fake-token");
-      navigate("/administrador");
-    } else {
-      localStorage.setItem("token", "fake-token");
-      navigate("/solicitante");
+    // ← NUEVO: Simulación fácil – set token y navega por rol seleccionado
+    localStorage.setItem('token', 'ok');  // Token simple pa' auth
+    console.log('Entrando como:', selectedRole);  // Debug en consola
+
+    // Redirige según rol elegido
+    switch (selectedRole) {
+      case "solicitante":
+        navigate("/solicitante");
+        break;
+      case "aprobador":
+        navigate("/aprobador");
+        break;
+      case "auditor":
+        navigate("/auditor");
+        break;
+      case "admin":
+        navigate("/administrador");
+        break;
+      default:
+        navigate("/solicitante");
     }
   };
 
@@ -130,6 +135,24 @@ export default function Login() {  // ← Nombre simple pa' React
                     className="h-12 border-2 border-gray-200 bg-white/50 backdrop-blur-sm transition-all focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20"
                   />
                 </div>
+                {/* ← NUEVO: Selector de rol pa' fácil testing */}
+                <div className="space-y-2">
+                  <Label htmlFor="role" className="text-base font-semibold text-gray-700">
+                    Selecciona Rol pa' Testing (Dev Mode)
+                  </Label>
+                  <Select value={selectedRole} onValueChange={setSelectedRole}>
+                    <SelectTrigger className="h-12">
+                      <SelectValue placeholder="Elige rol para entrar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="solicitante">Solicitante</SelectItem>
+                      <SelectItem value="aprobador">Aprobador</SelectItem>
+                      <SelectItem value="auditor">Auditor</SelectItem>
+                      <SelectItem value="admin">Administrador</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-gray-500 italic">Cambia rol sin cambiar email – solo pa' probar panels</p>
+                </div>
                 <div className="flex items-center space-x-3 rounded-lg border-2 border-dashed border-blue-200 bg-blue-50/50 p-4 transition-all hover:border-[#3B82F6] hover:bg-blue-50">
                   <Checkbox
                     id="mfa"
@@ -186,13 +209,13 @@ export default function Login() {  // ← Nombre simple pa' React
             {!showMfa && (
               <div className="flex flex-col items-center gap-3 text-sm">
                 <Link
-                  to="/recuperar"  // ← Cambiado: Si no tenés /recuperar, cambia a "/login" o crea la página
+                  to="/recuperar"
                   className="font-semibold text-[#3B82F6] transition-all hover:text-[#2563EB] hover:underline hover:underline-offset-4"
                 >
                   ¿Olvidaste tu contraseña?
                 </Link>
                 <Link
-                  to="/registro"  // ← to= en vez de href= pa' React Router
+                  to="/registro"
                   className="font-semibold text-[#3B82F6] transition-all hover:text-[#2563EB] hover:underline hover:underline-offset-4"
                 >
                   Registrarse (Solicitar cuenta) →
