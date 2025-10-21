@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";  // ← NUEVO: Pa' navigate suave
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

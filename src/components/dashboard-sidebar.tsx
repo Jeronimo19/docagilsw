@@ -1,7 +1,5 @@
-import React from "react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";  // ← Cambiado: React Router
-import type { ClassValue } from "clsx";  // Si cn usa clsx, instala si no
 
 interface SidebarItem {
   label: string;

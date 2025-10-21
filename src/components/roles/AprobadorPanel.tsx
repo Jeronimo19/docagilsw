@@ -10,7 +10,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { CheckCircle, XCircle, Clock, MessageSquare, QrCode } from "lucide-react";
 import { QRGenerator } from "@/components/qr-generator";
-import { generateQRData } from "@/lib/folio-generator";
 
 const sidebarItems = [
   { label: "Pendientes", href: "/aprobador", icon: "⏳" },
