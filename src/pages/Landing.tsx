@@ -58,11 +58,11 @@ export default function Landing() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+<div className="min-h-screen bg-[radial-gradient(circle,rgba(2,0,36,1),rgba(37,37,230,1),rgba(0,212,255,1))]">
       {/* Hero Section */}
       <section className="px-6 py-16 md:py-24">
         <div className="mx-auto max-w-6xl text-center">
-          <h1 className="mb-6 font-sans text-5xl font-bold text-[#10B981] md:text-6xl lg:text-7xl">
+          <h1 className="mb-6 font-sans text-5xl font-bold text-[#ffffff] md:text-6xl lg:text-7xl">
             DocAgil: Flujo de Aprobaciones y Control de Documentos Internos
           </h1>
           <p className="mb-8 text-2xl font-medium text-[#3B82F6] md:text-3xl">
@@ -72,16 +72,16 @@ export default function Landing() {
             <Link to="/registro">
               <Button
                 size="lg"
-                className="animate-pulse bg-[#3B82F6] px-10 py-7 text-xl font-semibold text-white shadow-lg transition-all hover:bg-[#10B981] hover:shadow-xl"
+                className="animate-pulse bg-[#10B981] px-10 py-7 text-xl font-semibold text-white shadow-lg transition-all hover:bg-[#0A0480] hover:shadow-xl"
               >
-                Registrar Gratis
+                Registrarse
               </Button>
             </Link>
             <Link to="/login">
               <Button
                 size="lg"
                 variant="outline"
-                className="px-10 py-7 text-xl font-semibold text-[#3B82F6] border-[#3B82F6] hover:bg-[#3B82F6] hover:text-white"
+                className="px-10 py-7 text-xl font-semibold text-[#3B82F6] border-[#3B82F6] hover:bg-[#10B981] hover:text-white"
               >
                 Iniciar Sesión
               </Button>
@@ -137,7 +137,7 @@ export default function Landing() {
           <Link to="/login">
             <Button
               size="lg"
-              className="animate-pulse bg-[#3B82F6] px-12 py-8 text-2xl font-bold text-white shadow-2xl transition-all hover:scale-110 hover:bg-[#10B981]"
+              className="animate-pulse bg-[#10B981] px-12 py-8 text-2xl font-bold text-white shadow-2xl transition-all hover:scale-110 hover:bg-[#0A0480]"
             >
               Iniciar Sesión
             </Button>
@@ -146,9 +146,9 @@ export default function Landing() {
             <Button
               size="lg"
               variant="outline"
-              className="px-12 py-8 text-2xl font-bold text-[#3B82F6] border-[#3B82F6] hover:bg-[#3B82F6] hover:text-white"
+              className="px-12 py-8 text-2xl font-bold text-[#3B82F6] border-[#3B82F6] hover:bg-[#10B981] hover:text-white"
             >
-              Registrar Gratis
+              Registrarse
             </Button>
           </Link>
         </div>
@@ -158,7 +158,7 @@ export default function Landing() {
       <footer className="border-t border-gray-200 bg-white px-6 py-10">
         <div className="mx-auto max-w-6xl">
           <div className="mb-6 text-center">
-            <h3 className="text-3xl font-bold text-[#10B981]">DocFlow</h3>
+            <h3 className="text-3xl font-bold text-[#10B981]">DocAgil</h3>
           </div>
           <div className="mb-4 flex justify-center gap-6">
             <a href="#" className="font-medium text-[#3B82F6] transition-colors hover:text-[#10B981]">
