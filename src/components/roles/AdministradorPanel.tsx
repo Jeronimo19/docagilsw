@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { DashboardSidebar } from "@/components/dashboard-sidebar";
 import { DashboardFooter } from "@/components/dashboard-footer";
@@ -33,8 +32,6 @@ const etapasFlujo = [
 ];
 
 export default function AdministradorPanel() {
-  const [selectedUser, setSelectedUser] = useState<number | null>(null);
-  const [editingFlow, setEditingFlow] = useState(false);
 
   const handleApproveUser = (userId: number) => {
     alert(`Usuario ${userId} aprobado exitosamente`);
@@ -170,7 +167,7 @@ export default function AdministradorPanel() {
               </CardHeader>
               <CardContent className="p-6 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {etapasFlujo.map((etapa, index) => (
+                  {etapasFlujo.map((etapa) => (
                     <Card key={etapa.numero} className="group hover:shadow-xl transition-all duration-300">
                       <CardHeader className="pb-3">
                         <div className="flex items-center gap-3">
