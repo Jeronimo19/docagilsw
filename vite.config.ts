@@ -10,4 +10,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),  // ← Esto hace que @ funcione en runtime
     },
   },
+  build: {
+    chunkSizeWarningLimit: 1000,  // Sube a 1MB pa' silenciar
+  },
 });
