@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { FileText, Upload, Save, Send, Bell, CheckCircle2} from "lucide-react";
+import { FileText, Save, Send, Bell, CheckCircle2 } from "lucide-react";
 import { QRGenerator } from "@/components/qr-generator";
 import { generateFolio, generateQRData } from "@/lib/folio-generator";
 
@@ -45,13 +45,27 @@ const notificaciones = [
 ];
 
 export default function SolicitantePanel() {
+  const [currentSection, setCurrentSection] = useState("crear"); // Default a primera sección
   const [titulo, setTitulo] = useState("");
   const [tipo, setTipo] = useState("");
   const [contenido, setContenido] = useState("");
   const [folio, setFolio] = useState("");
   const [qrData, setQrData] = useState("");
   const [showQR, setShowQR] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
+
+  // Mapeo tipado como Record<string, string> para evitar error de indexación
+  const sectionMap: Record<string, string> = {
+    "Crear Trámite": "crear",
+    "Mis Trámites": "tramites",
+    "Notificaciones": "notificaciones",
+  };
+
+  // handleSectionChange: Asume que DashboardSidebar llama esto con el label
+  const handleSectionChange = (label: string, e: React.MouseEvent) => {
+    e.preventDefault();  // ← FIX: Bloquea navegación real del href
+    const section = sectionMap[label] || "crear";
+    setCurrentSection(section);
+  };
 
   const handleTipoChange = (value: string) => {
     setTipo(value);
@@ -83,197 +97,224 @@ export default function SolicitantePanel() {
     }, 3000);
   };
 
+  const renderCrearTramite = () => (
+    <Card className="animate-in fade-in slide-in-from-bottom-4 border-2 border-[#3B82F6]/20 shadow-xl duration-700">
+      <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100">
+        <CardTitle className="text-2xl text-[#3B82F6]">Crear Nuevo Trámite</CardTitle>
+      </CardHeader>
+      <CardContent className="p-6 space-y-6">
+        <Alert className="border-2 border-[#3B82F6]/20 bg-gradient-to-r from-blue-50 to-blue-100/50 shadow-lg">
+          <AlertDescription className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#3B82F6] shadow-md">
+                <FileText className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className="font-semibold text-[#3B82F6]">¡Inicia tu trámite en minutos!</p>
+                <p className="text-sm text-blue-700">Genera folio y QR automáticamente</p>
+              </div>
+            </div>
+            <Bell className="h-5 w-5 text-[#3B82F6]" />
+          </AlertDescription>
+        </Alert>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="titulo" className="text-base font-semibold text-gray-700">
+              Título del Trámite
+            </Label>
+            <Input
+              id="titulo"
+              placeholder="Ej: Solicitud de compra de equipo"
+              value={titulo}
+              onChange={(e) => setTitulo(e.target.value)}
+              className="h-12 border-2 border-gray-200 focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="tipo" className="text-base font-semibold text-gray-700">
+              Tipo de Trámite
+            </Label>
+            <Select value={tipo} onValueChange={handleTipoChange}>
+              <SelectTrigger className="h-12">
+                <SelectValue placeholder="Selecciona el tipo de trámite" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="compra">Solicitud de Compra</SelectItem>
+                <SelectItem value="reembolso">Reembolso de Gastos</SelectItem>
+                <SelectItem value="vacaciones">Solicitud de Vacaciones</SelectItem>
+                <SelectItem value="permiso">Permiso Especial</SelectItem>
+              </SelectContent>
+            </Select>
+            {folio && (
+              <Badge className="mt-2 bg-green-100 text-green-800">
+                Folio generado: {folio}
+              </Badge>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="contenido" className="text-base font-semibold text-gray-700">
+              Descripción Detallada
+            </Label>
+            <Textarea
+              id="contenido"
+              placeholder="Describe el motivo y detalles del trámite..."
+              value={contenido}
+              onChange={(e) => setContenido(e.target.value)}
+              className="min-h-[120px] border-2 border-gray-200 focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20"
+            />
+          </div>
+
+          {showQR && (
+            <div className="text-center">
+              <p className="text-sm text-gray-600 mb-4">
+                Escanea este código para verificar tu documento
+              </p>
+              <QRGenerator value={qrData} size={200} />
+              <Badge className="mt-4 bg-[#10B981] px-4 py-2 text-sm text-white shadow-lg">
+                Folio: {folio}
+              </Badge>
+            </div>
+          )}
+
+          <div className="flex gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1 border-2 border-gray-300 bg-white transition-all hover:scale-105 hover:border-gray-400 hover:shadow-lg active:scale-95"
+              onClick={handleSaveDraft}
+            >
+              <Save className="mr-2 h-4 w-4" />
+              Guardar Borrador
+            </Button>
+            <Button
+              type="submit"
+              className="flex-1 bg-gradient-to-r from-[#10B981] to-[#059669] shadow-lg transition-all hover:scale-105 hover:shadow-xl active:scale-95"
+            >
+              <Send className="mr-2 h-4 w-4" />
+              Enviar Trámite
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+
+  const renderMisTramites = () => (
+    <Card className="animate-in fade-in slide-in-from-bottom-4 border-2 border-gray-200 shadow-2xl duration-700">
+      <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100">
+        <CardTitle className="text-2xl text-[#10B981]">Mis Trámites</CardTitle>
+      </CardHeader>
+      <CardContent className="p-6">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-b-2">
+              <TableHead className="font-bold">Folio</TableHead>
+              <TableHead className="font-bold">Tipo</TableHead>
+              <TableHead className="font-bold">Estado</TableHead>
+              <TableHead className="font-bold">Fecha</TableHead>
+              <TableHead className="font-bold">QR</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tramites.map((tramite, index) => (
+              <TableRow
+                key={tramite.id}
+                className="animate-in fade-in border-b transition-all hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent hover:shadow-md duration-300"
+                style={{ animationDelay: `${index * 100}ms` } as React.CSSProperties}
+              >
+                <TableCell className="font-bold text-gray-900">{tramite.id}</TableCell>
+                <TableCell className="font-medium">{tramite.tipo}</TableCell>
+                <TableCell>
+                  <Badge
+                    className={`shadow-md ${
+                      tramite.estado === "Aprobado"
+                        ? "bg-green-500 text-white"
+                        : tramite.estado === "En Revisión"
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-500 text-white"
+                    }`}
+                  >
+                    {tramite.estado}
+                  </Badge>
+                </TableCell>
+                <TableCell className="font-medium text-gray-600">{tramite.fecha}</TableCell>
+                <TableCell>
+                  <div className="rounded-lg bg-gray-50 p-2 shadow-inner transition-all hover:scale-110 hover:shadow-lg">
+                    <QRGenerator value={generateQRData(tramite.qr, tramite.tipo, tramite.fecha)} size={48} />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+
+  const renderNotificaciones = () => (
+    <Card className="animate-in fade-in slide-in-from-bottom-4 border-2 border-yellow-200 shadow-2xl duration-700">
+      <CardHeader className="bg-gradient-to-r from-yellow-50 to-yellow-100">
+        <CardTitle className="flex items-center gap-2 text-2xl text-[#10B981]">
+          <Bell className="h-6 w-6" />
+          Notificaciones
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-6 space-y-4">
+        {notificaciones.map((notif) => (
+          <div
+            key={notif.id}
+            className={`flex items-start gap-4 rounded-xl p-4 shadow-sm ${
+              notif.tipo === "success"
+                ? "bg-green-50 border-l-4 border-green-400"
+                : notif.tipo === "warning"
+                  ? "bg-yellow-50 border-l-4 border-yellow-400"
+                  : "bg-blue-50 border-l-4 border-blue-400"
+            }`}
+          >
+            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${
+              notif.tipo === "success" ? "bg-green-500" : notif.tipo === "warning" ? "bg-yellow-500" : "bg-blue-500"
+            }`}>
+              <CheckCircle2 className="h-5 w-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <p className="font-medium text-gray-900">{notif.mensaje}</p>
+              <p className="text-sm text-gray-600">Folio: {notif.folio}</p>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+
+  const renderSection = () => {
+    switch (currentSection) {
+      case "crear":
+        return renderCrearTramite();
+      case "tramites":
+        return renderMisTramites();
+      case "notificaciones":
+        return renderNotificaciones();
+      default:
+        return renderCrearTramite();
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-50 via-white to-green-50/20">
       <DashboardHeader userName="Solicitante" role="Rol: Solicitante" />
       <div className="flex flex-1">
-        <DashboardSidebar items={sidebarItems} />
-        <main className="flex-1 p-6">
+        <DashboardSidebar 
+          items={sidebarItems.map((item, _index) => ({  // ← FIX: Index para key única
+            ...item,
+            onClick: (e: React.MouseEvent) => handleSectionChange(item.label, e)  // ← FIX: preventDefault en onClick
+          }))} 
+        />
+        <main className="flex-1 p-6 overflow-y-auto">
           <div className="mx-auto max-w-6xl space-y-6">
-            <Alert className="animate-in fade-in slide-in-from-top-4 border-2 border-[#3B82F6]/20 bg-gradient-to-r from-blue-50 to-blue-100/50 shadow-lg duration-700">
-              <AlertDescription className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#3B82F6] shadow-md">
-                    <FileText className="h-5 w-5 text-white" />
-                  </div>
-                  <span className="font-semibold text-[#3B82F6]">
-                    Bienvenido al panel de Solicitante. Aquí puedes crear nuevos trámites y dar seguimiento a tus solicitudes.
-                  </span>
-                </div>
-                <Button variant="outline" size="sm" onClick={() => setShowNotifications(!showNotifications)}>
-                  <Bell className="h-4 w-4" />
-                </Button>
-              </AlertDescription>
-            </Alert>
-
-            {showNotifications && (
-              <Card className="animate-in fade-in slide-in-from-right-4 border-2 border-blue-200 bg-blue-50 shadow-lg duration-700">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg text-[#3B82F6]">
-                    <Bell className="h-5 w-5" />
-                    Notificaciones Recientes
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {notificaciones.map((notif) => (
-                      <div key={notif.id} className="flex items-start gap-3 rounded-lg p-3 transition-all hover:bg-blue-100">
-                        <div className={`flex h-10 w-10 items-center justify-center rounded-full shadow-md ${
-                          notif.tipo === "success" ? "bg-green-500" : notif.tipo === "warning" ? "bg-yellow-500" : "bg-blue-500"
-                        }`}>
-                          <CheckCircle2 className="h-5 w-5 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-900">{notif.mensaje}</p>
-                          <p className="text-sm text-gray-600">Folio: <Badge variant="secondary">{notif.folio}</Badge></p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            <Card className="animate-in fade-in slide-in-from-bottom-4 border-2 border-green-200 shadow-2xl duration-700">
-              <CardHeader className="bg-gradient-to-r from-green-50 to-green-100">
-                <CardTitle className="flex items-center gap-2 text-2xl text-[#10B981]">
-                  <Upload className="h-6 w-6" />
-                  Crear Nuevo Trámite
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 space-y-6">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="titulo">Título del Trámite</Label>
-                      <Input
-                        id="titulo"
-                        type="text"
-                        placeholder="Ej: Solicitud de compra de equipo"
-                        value={titulo}
-                        onChange={(e) => setTitulo(e.target.value)}
-                        className="h-12 border-2 border-gray-200 focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition-all"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="tipo">Tipo de Trámite</Label>
-                      <Select value={tipo} onValueChange={handleTipoChange}>
-                        <SelectTrigger className="h-12">
-                          <SelectValue placeholder="Selecciona el tipo de trámite" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="compra">Solicitud de Compra</SelectItem>
-                          <SelectItem value="reembolso">Reembolso</SelectItem>
-                          <SelectItem value="vacaciones">Vacaciones</SelectItem>
-                          <SelectItem value="permiso">Permiso</SelectItem>
-                          <SelectItem value="capacitacion">Capacitación</SelectItem>
-                          <SelectItem value="viaje">Viaje de Negocios</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {folio && (
-                        <Badge variant="secondary" className="mt-2">
-                          Folio Generado: {folio}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="contenido">Descripción Detallada</Label>
-                    <Textarea
-                      id="contenido"
-                      placeholder="Describe el trámite con todos los detalles necesarios..."
-                      value={contenido}
-                      onChange={(e) => setContenido(e.target.value)}
-                      rows={6}
-                      className="border-2 border-gray-200 focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition-all"
-                    />
-                  </div>
-                  {showQR && (
-                    <div className="animate-in fade-in zoom-in rounded-2xl bg-gradient-to-r from-green-50 to-green-100 p-8 text-center shadow-2xl duration-700">
-                      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#10B981] shadow-lg">
-                        <CheckCircle2 className="h-8 w-8 text-white" />
-                      </div>
-                      <p className="text-xl font-bold text-[#10B981]">Código QR Generado</p>
-                      <div className="rounded-xl bg-white p-4 shadow-xl ring-4 ring-[#10B981]/20">
-                        <QRGenerator value={qrData} size={200} />
-                      </div>
-                      <p className="text-center text-sm font-medium text-gray-600">
-                        Escanea este código para verificar tu documento
-                      </p>
-                      <Badge className="bg-[#10B981] px-4 py-2 text-sm text-white shadow-lg">Folio: {folio}</Badge>
-                    </div>
-                  )}
-                  <div className="flex gap-3">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex-1 border-2 border-gray-300 bg-white transition-all hover:scale-105 hover:border-gray-400 hover:shadow-lg active:scale-95"
-                      onClick={handleSaveDraft}
-                    >
-                      <Save className="mr-2 h-4 w-4" />
-                      Guardar Borrador
-                    </Button>
-                    <Button
-                      type="submit"
-                      className="flex-1 bg-gradient-to-r from-[#10B981] to-[#059669] shadow-lg transition-all hover:scale-105 hover:shadow-xl active:scale-95"
-                    >
-                      <Send className="mr-2 h-4 w-4" />
-                      Enviar Trámite
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-
-            <Card className="animate-in fade-in slide-in-from-bottom-4 border-2 border-gray-200 shadow-2xl duration-700 delay-300">
-              <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100">
-                <CardTitle className="text-2xl text-[#10B981]">Mis Trámites</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-b-2">
-                      <TableHead className="font-bold">Folio</TableHead>
-                      <TableHead className="font-bold">Tipo</TableHead>
-                      <TableHead className="font-bold">Estado</TableHead>
-                      <TableHead className="font-bold">Fecha</TableHead>
-                      <TableHead className="font-bold">QR</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {tramites.map((tramite, index) => (
-                      <TableRow
-                        key={tramite.id}
-                        className="animate-in fade-in border-b transition-all hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent hover:shadow-md duration-300"
-                        style={{ animationDelay: `${index * 100}ms` } as React.CSSProperties}
-                      >
-                        <TableCell className="font-bold text-gray-900">{tramite.id}</TableCell>
-                        <TableCell className="font-medium">{tramite.tipo}</TableCell>
-                        <TableCell>
-                          <Badge
-                            className={`shadow-md ${
-                              tramite.estado === "Aprobado"
-                                ? "bg-green-500 text-white"
-                                : tramite.estado === "En Revisión"
-                                  ? "bg-blue-500 text-white"
-                                  : "bg-gray-500 text-white"
-                            }`}
-                          >
-                            {tramite.estado}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="font-medium text-gray-600">{tramite.fecha}</TableCell>
-                        <TableCell>
-                          <div className="rounded-lg bg-gray-50 p-2 shadow-inner transition-all hover:scale-110 hover:shadow-lg">
-                            <QRGenerator value={generateQRData(tramite.qr, tramite.tipo, tramite.fecha)} size={48} />
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+            {renderSection()}
           </div>
         </main>
       </div>
