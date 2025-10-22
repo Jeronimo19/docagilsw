@@ -5,31 +5,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Shield, FileText, CheckCircle2, Lock } from "lucide-react";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [selectedRole, setSelectedRole] = useState("solicitante");  // ← NUEVO: Selector de rol default
   const [mfaEnabled, setMfaEnabled] = useState(false);
   const [mfaCode, setMfaCode] = useState("");
   const [showMfa, setShowMfa] = useState(false);
   const navigate = useNavigate();
 
-  const isInstitutionalEmail = (email: string) => {
-    const institutionalDomains = ["empresa.com", "docflow.com", "institucion.edu"];
-    const domain = email.split("@")[1];
-    return institutionalDomains.includes(domain);
+  const getRoleFromUsername = (username: string) => {
+    const lowerUsername = username.toLowerCase();
+    if (lowerUsername.includes("solicitante")) return "solicitante";
+    if (lowerUsername.includes("aprobador")) return "aprobador";
+    if (lowerUsername.includes("auditor")) return "auditor";
+    if (lowerUsername.includes("admin")) return "admin";
+    return "solicitante"; // Default
   };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!isInstitutionalEmail(email)) {
-      alert("Por favor usa un correo institucional válido");
-      return;
-    }
 
     if (mfaEnabled && !showMfa) {
       setShowMfa(true);
@@ -43,12 +39,13 @@ export default function Login() {
       }
     }
 
-    // ← NUEVO: Simulación fácil – set token y navega por rol seleccionado
+    // Simulación fácil – set token y navega por rol detectado del username
     localStorage.setItem('token', 'ok');  // Token simple pa' auth
-    console.log('Entrando como:', selectedRole);  // Debug en consola
+    const detectedRole = getRoleFromUsername(username);
+    console.log('Entrando como:', detectedRole, 'con usuario:', username);  // Debug en consola
 
-    // Redirige según rol elegido
-    switch (selectedRole) {
+    // Redirige según rol detectado
+    switch (detectedRole) {
       case "solicitante":
         navigate("/solicitante");
         break;
@@ -73,13 +70,13 @@ export default function Login() {
         <div className="absolute -right-4 bottom-1/4 h-72 w-72 animate-pulse rounded-full bg-blue-200/20 blur-3xl delay-1000" />
       </div>
 
-      <Card className="relative z-10 w-full max-w-md animate-in fade-in slide-in-from-bottom-4 border-white/20 bg-white/80 shadow-2xl backdrop-blur-xl duration-700">
+      <Card className="relative z-10 w-full max-w-md animate-in fade-in slide-in-from-bottom-4 border-white/20 bg-gray-100 shadow-[0_20px_60px_rgba(0,0,0,0.6)] backdrop-blur-xl duration-700">
         <CardHeader className="space-y-4 text-center">
           <div className="mx-auto flex h-20 w-20 animate-in zoom-in items-center justify-center rounded-2xl bg-gradient-to-br from-[#10B981] to-[#059669] shadow-lg duration-1000">
             <FileText className="h-10 w-10 text-white" />
           </div>
           <CardTitle className="animate-in fade-in text-5xl font-bold text-[#10B981] duration-1000 delay-200">
-            DocFlow
+            DocAgil
           </CardTitle>
           <CardDescription className="animate-in fade-in text-lg text-gray-600 duration-1000 delay-300">
             Sistema de Gestión de Documentos Internos
@@ -104,21 +101,24 @@ export default function Login() {
             {!showMfa ? (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-base font-semibold text-gray-700">
-                    Correo Electrónico Institucional
+                  <Label htmlFor="username" className="text-base font-semibold text-gray-700">
+                    Nombre de Usuario
                   </Label>
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="usuario@empresa.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    id="username"
+                    type="text"
+                    placeholder="solicitante"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
                     className="h-12 border-2 border-gray-200 bg-white/50 backdrop-blur-sm transition-all focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20"
                   />
                   <p className="flex items-center gap-1 text-xs text-gray-500">
                     <CheckCircle2 className="h-3 w-3 text-[#10B981]" />
-                    Usa tu correo institucional (@empresa.com, @docflow.com, @institucion.edu)
+                    Usa tu nombre de usuario (ej: solicitante, aprobador)
+                  </p>
+                  <p className="text-xs text-gray-500 italic mt-1">
+                    Rol se detecta automáticamente por el nombre (ej: solicitante → Solicitante)
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -134,24 +134,6 @@ export default function Login() {
                     required
                     className="h-12 border-2 border-gray-200 bg-white/50 backdrop-blur-sm transition-all focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20"
                   />
-                </div>
-                {/* ← NUEVO: Selector de rol pa' fácil testing */}
-                <div className="space-y-2">
-                  <Label htmlFor="role" className="text-base font-semibold text-gray-700">
-                    Selecciona Rol pa' Testing (Dev Mode)
-                  </Label>
-                  <Select value={selectedRole} onValueChange={setSelectedRole}>
-                    <SelectTrigger className="h-12">
-                      <SelectValue placeholder="Elige rol para entrar" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="solicitante">Solicitante</SelectItem>
-                      <SelectItem value="aprobador">Aprobador</SelectItem>
-                      <SelectItem value="auditor">Auditor</SelectItem>
-                      <SelectItem value="admin">Administrador</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-gray-500 italic">Cambia rol sin cambiar email – solo pa' probar panels</p>
                 </div>
                 <div className="flex items-center space-x-3 rounded-lg border-2 border-dashed border-blue-200 bg-blue-50/50 p-4 transition-all hover:border-[#3B82F6] hover:bg-blue-50">
                   <Checkbox

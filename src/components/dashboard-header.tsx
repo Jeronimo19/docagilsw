@@ -32,11 +32,12 @@ export function DashboardHeader({ userName, role }: DashboardHeaderProps) {
           </div>
           <div className="animate-in fade-in slide-in-from-left-4 duration-700">
             <h1 className="text-2xl font-bold text-white drop-shadow-sm">Hola, {userName}</h1>
-            <p className="flex items-center gap-2 text-sm text-white/90">
+            {/* ← FIX: Cambié <p> por <div> para evitar nesting inválido con Badge (div hijo) */}
+            <div className="flex items-center gap-2 text-sm text-white/90">
               <Badge variant="secondary" className="bg-white/20 text-white backdrop-blur-sm">
                 {role}
               </Badge>
-            </p>
+            </div>
           </div>
         </div>
 
