@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";  // ← Agregado: Para clases condicionales
 import { DashboardHeader } from "@/components/dashboard-header";
 import { DashboardSidebar } from "@/components/dashboard-sidebar";
 import { DashboardFooter } from "@/components/dashboard-footer";
@@ -7,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { BarChart3, FileText, TrendingUp, Download, FileSpreadsheet, QrCode } from "lucide-react";
+import { BarChart3, FileText, TrendingUp, Download, FileSpreadsheet, QrCode, Loader2 } from "lucide-react";  // ← Agregado Loader2
 import { QRGenerator } from "@/components/qr-generator";
 import { generateQRData } from "@/lib/folio-generator";
 import {
@@ -29,7 +30,8 @@ const sidebarItems = [
   { label: "Bitácora Global", href: "/auditor/bitacora", icon: "📋" },
 ];
 
-const historial = [
+// Datos hardcodeados, pero con loader simulado
+const initialHistorial = [
   {
     id: "COM-202501-0001",
     tipo: "Compra",
@@ -81,20 +83,41 @@ const rechazosData = [
 ];
 
 export default function AuditorPanel() {
-  const [currentSection, setCurrentSection] = useState("kpis"); // Default a primera sección
+  const [currentSection, setCurrentSection] = useState("kpis");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);  // ← NUEVO: Mobile sidebar
+  const [historial, setHistorial] = useState(initialHistorial);  // ← Con setter pa' loader
+  const [loading, setLoading] = useState(true);  // ← NUEVO: Loader
+  const [error, setError] = useState<string | null>(null);
 
-  // Mapeo tipado como Record<string, string> para evitar error de indexación
+  // ← NUEVO: Fetch simulado pa' datos
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        await new Promise(resolve => setTimeout(resolve, 1500));  // Simula API
+        setHistorial(initialHistorial);
+        console.log("Datos de auditor cargados (simulado)");
+      } catch (err) {
+        setError("Error al cargar datos: " + (err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   const sectionMap: Record<string, string> = {
     "KPIs": "kpis",
     "Reportes": "reportes",
     "Bitácora Global": "bitacora",
   };
 
-  // handleSectionChange: Asume que DashboardSidebar llama esto con el label
   const handleSectionChange = (label: string, e: React.MouseEvent) => {
-    e.preventDefault();  // ← FIX: Bloquea navegación real del href
+    e.preventDefault();
     const section = sectionMap[label] || "kpis";
     setCurrentSection(section);
+    if (window.innerWidth < 1024) setIsSidebarOpen(false);  // ← Cierra sidebar en mobile
   };
 
   const handleExportPDF = () => {
@@ -109,8 +132,10 @@ export default function AuditorPanel() {
     alert("Exportando datos a CSV...");
   };
 
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
   const renderKPIs = () => (
-    <div className="grid gap-6 md:grid-cols-3">
+    <div className="grid gap-6 md:grid-cols-3">  {/* ← Ya responsive */}
       <Card className="shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium text-gray-600">Tiempo Promedio de Ciclo</CardTitle>
@@ -157,7 +182,7 @@ export default function AuditorPanel() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="dias" stroke="#10B981" activeDot={{ r: 8 }} />
+              <Line type="monotone" dataKey="dias" stroke="#10B981" strokeWidth={3} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -220,56 +245,68 @@ export default function AuditorPanel() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="mb-4 flex gap-3">
-          <Select>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filtrar por tipo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos</SelectItem>
-              <SelectItem value="compra">Compra</SelectItem>
-              <SelectItem value="reembolso">Reembolso</SelectItem>
-              <SelectItem value="vacaciones">Vacaciones</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filtrar por estado" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos</SelectItem>
-              <SelectItem value="aprobado">Aprobado</SelectItem>
-              <SelectItem value="rechazado">Rechazado</SelectItem>
-              <SelectItem value="pendiente">Pendiente</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Folio</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Tiempo</TableHead>
-              <TableHead>Fecha</TableHead>
-              <TableHead>QR</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {historial.map((doc) => (
-              <TableRow key={doc.id} className="hover:bg-gray-50 transition-colors">
-                <TableCell className="font-medium">{doc.id}</TableCell>
-                <TableCell>{doc.tipo}</TableCell>
-                <TableCell>{doc.estado}</TableCell>
-                <TableCell>{doc.tiempo}</TableCell>
-                <TableCell>{doc.fecha}</TableCell>
-                <TableCell>
-                  <QRGenerator value={generateQRData(doc.qr, doc.tipo, doc.fecha)} size={48} />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-green-500" />
+          </div>
+        ) : error ? (
+          <p className="text-red-500 text-center">{error}</p>
+        ) : (
+          <>
+            <div className="mb-4 flex flex-col sm:flex-row gap-3">  {/* ← Responsive flex */}
+              <Select>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Filtrar por tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
+                  <SelectItem value="compra">Compra</SelectItem>
+                  <SelectItem value="reembolso">Reembolso</SelectItem>
+                  <SelectItem value="vacaciones">Vacaciones</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Filtrar por estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
+                  <SelectItem value="aprobado">Aprobado</SelectItem>
+                  <SelectItem value="rechazado">Rechazado</SelectItem>
+                  <SelectItem value="pendiente">Pendiente</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="w-full overflow-x-auto">  {/* ← FIX: Responsive scroll */}
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Folio</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead>Tiempo</TableHead>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead>QR</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {historial.map((doc) => (
+                    <TableRow key={doc.id} className="hover:bg-gray-50 transition-colors">
+                      <TableCell className="font-medium">{doc.id}</TableCell>
+                      <TableCell>{doc.tipo}</TableCell>
+                      <TableCell>{doc.estado}</TableCell>
+                      <TableCell>{doc.tiempo}</TableCell>
+                      <TableCell>{doc.fecha}</TableCell>
+                      <TableCell>
+                        <QRGenerator value={generateQRData(doc.qr, doc.tipo, doc.fecha)} size={48} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );
@@ -289,16 +326,21 @@ export default function AuditorPanel() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader userName="Auditor" role="Rol: Auditor" />
+      <DashboardHeader userName="Auditor" role="Rol: Auditor" onMenuToggle={toggleSidebar} />  {/* ← Pasando toggle */}
       <div className="flex flex-1">
         <DashboardSidebar 
-          items={sidebarItems.map((item, _index) => ({  // ← FIX: Index para key única en sidebar
+          items={sidebarItems.map((item) => ({
             ...item,
-            onClick: (e: React.MouseEvent) => handleSectionChange(item.label, e)  // ← FIX: preventDefault en onClick
+            onClick: (e: React.MouseEvent) => handleSectionChange(item.label, e)
           }))} 
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}  // ← Agregado pa' mobile
         />
-        <main className="flex-1 bg-gray-50 p-6 overflow-y-auto">
-          <div className="mx-auto max-w-6xl space-y-6">
+        <main className={cn(  // ← Usando cn pa' responsive
+          "flex-1 bg-gray-50 transition-all duration-300 p-2 sm:p-4 lg:p-6 overflow-y-auto w-full",
+          isSidebarOpen ? "lg:ml-0 ml-0" : "ml-0"
+        )}>
+          <div className="mx-auto max-w-6xl space-y-6 w-full"> {/* ← Centrado y max width */}
             {renderSection()}
           </div>
         </main>

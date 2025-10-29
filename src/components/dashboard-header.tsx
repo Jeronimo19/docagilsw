@@ -2,15 +2,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, LogOut, User, Settings } from "lucide-react";
+import { Bell, LogOut, User, Settings, Menu } from "lucide-react";  // ← Agregué Menu
 import { Link } from "react-router-dom";
 
 interface DashboardHeaderProps {
   userName: string;
   role: string;
+  onMenuToggle: () => void;  // ← NUEVO: Para hamburguesa
 }
 
-export function DashboardHeader({ userName, role }: DashboardHeaderProps) {
+export function DashboardHeader({ userName, role, onMenuToggle }: DashboardHeaderProps) {
   const [notificationCount] = useState(3);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const navigate = useNavigate();
@@ -22,10 +23,20 @@ export function DashboardHeader({ userName, role }: DashboardHeaderProps) {
   };
 
   return (
-    <header className="relative border-b border-sky-200/30 bg-gradient-to-r from-sky-500 via-sky-600 to-sky-500 px-6 py-4 shadow-lg">
+    <header className="relative border-b border-sky-200/30 bg-gradient-to-r from-sky-500 via-sky-600 to-sky-500 px-4 lg:px-6 py-4 shadow-lg lg:pl-0">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30" />
 
       <div className="relative flex items-center justify-between">
+        {/* ← NUEVO: Hamburguesa solo en mobile */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="lg:hidden text-white"
+          onClick={onMenuToggle}
+        >
+          <Menu className="h-6 w-6" />
+        </Button>
+
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 animate-in zoom-in items-center justify-center rounded-full bg-white/20 backdrop-blur-sm ring-2 ring-white/30 duration-500">
             <User className="h-6 w-6 text-white" />
