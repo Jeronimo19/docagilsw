@@ -37,8 +37,8 @@ export default function MiCuenta() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      <header className="border-b border-green-600/20 bg-[#10B981] px-6 py-6 shadow-md">
+    <div className="flex min-h-screen flex-col bg-gray-400">  {/* ← CAMBIO: bg-slate-50 (gris claro para fondo) */}
+      <header className="relative border-b border-sky-200/30 bg-gradient-to-r from-sky-500 via-sky-600 to-sky-500 px-6 py-6 shadow-slate-100">
         <div className="mx-auto max-w-6xl">
           <div className="flex items-center justify-between">
             <div>
@@ -49,7 +49,7 @@ export default function MiCuenta() {
             </div>
             <Button
               variant="outline"
-              className="gap-2 border-white bg-white/10 text-white backdrop-blur-sm hover:bg-white hover:text-[#10B981]"
+              className="gap-2 border-white/20 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white"
               onClick={handleBackToDashboard}
             >
               <ArrowLeft className="h-4 w-4" />
@@ -59,75 +59,74 @@ export default function MiCuenta() {
         </div>
       </header>
 
-
       <main className="flex-1 px-6 py-8">
         <div className="mx-auto max-w-6xl space-y-6">
-          <Card className="shadow-lg transition-shadow hover:shadow-xl">
+          <Card className="shadow-slate-100 transition-shadow hover:shadow-slate-200 border-slate-200 bg-white">  {/* ← CAMBIO: bg-white explícito para contrastar con fondo gris */}
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-[#10B981]">
+              <CardTitle className="flex items-center gap-2 text-sky-700">
                 <User className="h-6 w-6" />
                 Datos Personales
               </CardTitle>
-              <CardDescription>Administra tu información personal</CardDescription>
+              <CardDescription className="text-slate-600">Administra tu información personal</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Nombre Completo</Label>
+                  <Label htmlFor="name" className="text-slate-700">Nombre Completo</Label>
                   <Input
                     id="name"
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
                     disabled={!isEditing}
-                    className="disabled:opacity-70"
+                    className="disabled:opacity-70 border-slate-300 focus:border-sky-500 focus:ring-sky-500/20"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email" className="text-slate-700">Email</Label>
                   <Input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={!isEditing}
-                    className="disabled:opacity-70"
+                    className="disabled:opacity-70 border-slate-300 focus:border-sky-500 focus:ring-sky-500/20"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="department">Departamento</Label>
+                  <Label htmlFor="department" className="text-slate-700">Departamento</Label>
                   <Input
                     id="department"
                     value={department}
                     onChange={(e) => setDepartment(e.target.value)}
                     disabled={!isEditing}
-                    className="disabled:opacity-70"
+                    className="disabled:opacity-70 border-slate-300 focus:border-sky-500 focus:ring-sky-500/20"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="role">Rol</Label>
-                  <Input id="role" value={userRole} disabled className="opacity-70" />
+                  <Label htmlFor="role" className="text-slate-700">Rol</Label>
+                  <Input id="role" value={userRole} disabled className="opacity-70 border-slate-300" />
                 </div>
               </div>
 
               <div className="flex gap-3">
                 {!isEditing ? (
                   <>
-                    <Button className="gap-2 bg-[#3B82F6] hover:bg-[#2563EB]" onClick={() => setIsEditing(true)}>
+                    <Button className="gap-2 bg-sky-500 hover:bg-sky-600 text-white" onClick={() => setIsEditing(true)}>
                       Editar Perfil
                     </Button>
-                    <Button className="gap-2 bg-[#10B981] hover:bg-[#059669]" onClick={handleChangePassword}>
+                    <Button className="gap-2 bg-sky-500 hover:bg-sky-600 text-white" onClick={handleChangePassword}>
                       Cambiar Contraseña
                     </Button>
                   </>
                 ) : (
                   <>
-                    <Button className="gap-2 bg-[#3B82F6] hover:bg-[#2563EB]" onClick={handleSaveProfile}>
+                    <Button className="gap-2 bg-sky-500 hover:bg-sky-600 text-white" onClick={handleSaveProfile}>
                       Guardar Cambios
                     </Button>
-                    <Button variant="outline" onClick={() => setIsEditing(false)}>
+                    <Button variant="outline" className="border-slate-300 text-slate-700 hover:bg-slate-50">
                       Cancelar
                     </Button>
                   </>
@@ -136,42 +135,42 @@ export default function MiCuenta() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg transition-shadow hover:shadow-xl">
+          <Card className="shadow-slate-100 transition-shadow hover:shadow-slate-200 border-slate-200 bg-white">  {/* ← CAMBIO: bg-white para contrastar */}
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-[#10B981]">
+              <CardTitle className="flex items-center gap-2 text-sky-700">
                 <FileText className="h-6 w-6" />
                 Historial de Actividad
               </CardTitle>
-              <CardDescription>Últimas acciones realizadas en el sistema</CardDescription>
+              <CardDescription className="text-slate-600">Últimas acciones realizadas en el sistema</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b-2 border-gray-200">
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Fecha</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Acción</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Documento</th>
+                    <tr className="border-b-2 border-slate-200">
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-slate-700">Fecha</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-slate-700">Acción</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-slate-700">Documento</th>
                     </tr>
                   </thead>
                   <tbody>
                     {activityHistory.map((activity, index) => (
-                      <tr key={index} className="border-b border-gray-100 transition-colors hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm text-gray-600">{activity.date}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{activity.action}</td>
-                        <td className="px-4 py-3 text-sm text-gray-600">{activity.documentId}</td>
+                      <tr key={index} className="border-b border-slate-100 transition-colors hover:bg-slate-50">
+                        <td className="px-4 py-3 text-sm text-slate-600">{activity.date}</td>
+                        <td className="px-4 py-3 text-sm text-slate-900">{activity.action}</td>
+                        <td className="px-4 py-3 text-sm text-slate-600">{activity.documentId}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
 
-              <div className="mt-4 flex items-center justify-between border-t border-gray-200 pt-4">
-                <p className="text-sm text-gray-600">Mostrando 5 actividades recientes</p>
+              <div className="mt-4 flex items-center justify-between border-t border-slate-200 pt-4">
+                <p className="text-sm text-slate-600">Mostrando 5 actividades recientes</p>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="text-[#3B82F6] hover:bg-[#3B82F6] hover:text-white bg-transparent"
+                  className="text-sky-500 hover:bg-sky-50 border-slate-300"
                 >
                   Ver Todo el Historial
                 </Button>

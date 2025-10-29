@@ -1,4 +1,4 @@
-// src/components/dashboard-sidebar.tsx (FIX: Actualiza interface para onClick con e)
+// src/components/dashboard-sidebar.tsx
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 
@@ -6,7 +6,7 @@ interface SidebarItem {
   label: string;
   href: string;
   icon: string;
-  onClick?: (e: React.MouseEvent) => void;  // ← FIX: Acepta e para preventDefault
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 interface DashboardSidebarProps {
@@ -15,18 +15,18 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({ items }: DashboardSidebarProps) {
   return (
-    <aside className="w-64 border-r border-gray-200 bg-[#3B82F6] p-4">
+    <aside className="w-64 border-r border-slate-200 bg-slate-500 p-4">  {/* ← CAMBIO: bg-slate-800 (gris oscuro, no repite con header sky) */}
       <nav className="space-y-2">
         {items.map((item, index) => (
           <Link
-            key={`${item.label}-${index}`}  // Key única
+            key={`${item.label}-${index}`}
             to={item.href}
             onClick={(e) => {
-              if (item.onClick) item.onClick(e);  // ← Llama onClick con e
+              if (item.onClick) item.onClick(e);
             }}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-4 py-3 text-white transition-all hover:bg-white/20",
-              "focus:bg-white/30 focus:outline-none"
+              "flex items-center gap-3 rounded-lg px-4 py-3 text-white transition-all hover:bg-slate-700 hover:scale-105 focus:bg-slate-700 focus:outline-none",  // ← CAMBIO: hover bg-slate-700 para gris suave, sin repetición de sky
+              "focus:outline-none"
             )}
           >
             <span className="text-xl">{item.icon}</span>
