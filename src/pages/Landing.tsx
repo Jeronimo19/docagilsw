@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { motion } from 'framer-motion';
-import { Plane, Cloud, Star, Sparkles, Bird, Wind } from 'lucide-react';
 
 export default function Landing() {
   const teamMembers = [
@@ -63,200 +61,6 @@ export default function Landing() {
     <div className="min-h-screen bg-[radial-gradient(circle,rgba(2,0,36,1),rgba(37,37,230,1),rgba(0,212,255,1))] relative overflow-hidden">
       {/* Hero Section - Solo animación de fondo, contenido encima sin separación */}
       <section className="relative px-6 py-16 md:py-24 min-h-[80vh]">
-        {/* Animated Background Elements - z-0, fondo transparente */}
-        {/* Paper Plane */}
-        <motion.div
-          className="absolute text-white z-0"
-          initial={{ x: -100, y: 100, rotate: -45 }}
-          animate={{
-            x: ["0vw", "50vw", "100vw"],
-            y: ["20vh", "40vh", "30vh", "50vh", "10vh"],
-            rotate: [-45, -30, -45, -20, -45],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        >
-          <Plane size={48} strokeWidth={1.5} />
-        </motion.div>
-
-        {/* Cloud 1 */}
-        <motion.div
-          className="absolute top-20 text-white/80 z-0"
-          initial={{ x: -100 }}
-          animate={{ x: ["0vw", "100vw"] }}
-          transition={{
-            duration: 30,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        >
-          <Cloud size={64} strokeWidth={1} fill="white" />
-        </motion.div>
-
-        {/* Cloud 2 */}
-        <motion.div
-          className="absolute top-40 text-white/60 z-0"
-          initial={{ x: -150 }}
-          animate={{ x: ["0vw", "100vw"] }}
-          transition={{
-            duration: 40,
-            repeat: Infinity,
-            ease: "linear",
-            delay: 5,
-          }}
-        >
-          <Cloud size={80} strokeWidth={1} fill="white" />
-        </motion.div>
-
-        {/* Stars */}
-        <motion.div
-          className="absolute top-32 left-1/4 text-white z-0"
-          animate={{
-            scale: [1, 1.3, 1],
-            rotate: [0, 180, 360],
-            opacity: [0.6, 1, 0.6],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        >
-          <Star size={32} fill="white" />
-        </motion.div>
-
-        <motion.div
-          className="absolute top-64 right-1/3 text-white z-0"
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, -180, -360],
-            opacity: [0.5, 1, 0.5],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1,
-          }}
-        >
-          <Star size={24} fill="white" />
-        </motion.div>
-
-        {/* Shooting Star */}
-        <motion.div
-          className="absolute text-white z-0"
-          initial={{ x: "100vw", y: -50, rotate: -45 }}
-          animate={{
-            x: ["-10vw"],
-            y: ["50vh"],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            repeatDelay: 8,
-            ease: "easeIn",
-          }}
-        >
-          <Sparkles size={32} />
-        </motion.div>
-
-        {/* Balloon */}
-        <motion.div
-          className="absolute bottom-20 left-1/4 text-white z-0"
-          animate={{
-            y: [-20, 20, -20],
-            x: [-10, 10, -10],
-          }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        >
-          <svg width="40" height="60" viewBox="0 0 40 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="20" cy="20" rx="18" ry="22" fill="white" opacity="0.9" />
-            <path d="M20 42 Q18 50, 20 58" stroke="white" strokeWidth="1" fill="none" />
-          </svg>
-        </motion.div>
-
-        {/* Butterfly */}
-        <motion.div
-          className="absolute top-1/3 right-1/4 text-white z-0"
-          animate={{
-            x: [0, 30, -30, 0],
-            y: [0, -20, 20, 0],
-            rotate: [0, 10, -10, 0],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        >
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M24 24 Q18 18, 12 20 Q8 22, 10 28 Q12 32, 18 30 Q22 28, 24 24" fill="white" opacity="0.8" />
-            <path d="M24 24 Q30 18, 36 20 Q40 22, 38 28 Q36 32, 30 30 Q26 28, 24 24" fill="white" opacity="0.8" />
-            <circle cx="24" cy="24" r="2" fill="white" />
-          </svg>
-        </motion.div>
-
-        {/* Kite */}
-        <motion.div
-          className="absolute top-1/4 right-1/3 text-white z-0"
-          animate={{
-            x: [0, 40, 0],
-            y: [0, -30, 0],
-            rotate: [5, 15, 5],
-          }}
-          transition={{
-            duration: 7,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        >
-          <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M28 8 L40 28 L28 40 L16 28 Z" fill="white" opacity="0.85" />
-            <line x1="28" y1="40" x2="28" y2="52" stroke="white" strokeWidth="1" />
-            <circle cx="28" cy="46" r="2" fill="white" />
-            <circle cx="28" cy="50" r="2" fill="white" />
-          </svg>
-        </motion.div>
-
-        {/* Bird */}
-        <motion.div
-          className="absolute top-1/2 text-white z-0"
-          initial={{ x: "100vw" }}
-          animate={{
-            x: ["-10vw"],
-            y: [0, -20, 10, -15, 0],
-          }}
-          transition={{
-            x: { duration: 25, repeat: Infinity, ease: "linear" },
-            y: { duration: 5, repeat: Infinity, ease: "easeInOut" },
-          }}
-        >
-          <Bird size={36} strokeWidth={1.5} />
-        </motion.div>
-
-        {/* Wind/Breeze Effect */}
-        <motion.div
-          className="absolute bottom-1/3 left-1/3 text-white/40 z-0"
-          animate={{
-            x: [0, 100],
-            opacity: [0, 0.6, 0],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeOut",
-          }}
-        >
-          <Wind size={48} />
-        </motion.div>
-
         {/* Contenido del Hero - z-20, sin animaciones que causen glitches */}
         <div className="mx-auto max-w-6xl text-center relative z-20">
         <h1
@@ -272,7 +76,8 @@ export default function Landing() {
             Automatiza tus documentos internos y reduce tiempos en 50%
           </p>
           <div className="flex justify-center gap-4">
-            <Link to="/registro">
+            {/* ← CAMBIO: Link a /auth con tab=register */}
+            <Link to="/auth?tab=register">
               <Button
                 size="lg"
                 className="bg-[#10B981] px-10 py-7 text-xl font-semibold text-white shadow-lg transition-all hover:bg-[#0A0480] hover:shadow-xl"
@@ -280,7 +85,8 @@ export default function Landing() {
                 Registrarse
               </Button>
             </Link>
-            <Link to="/login">
+            {/* ← CAMBIO: Link a /auth con tab=login */}
+            <Link to="/auth?tab=login">
               <Button
                 size="lg"
                 variant="outline"
@@ -337,7 +143,8 @@ export default function Landing() {
       {/* CTA Section */}
       <section className="px-6 py-16">
         <div className="mx-auto max-w-6xl text-center">
-          <Link to="/login">
+          {/* ← CAMBIO: Link a /auth con tab=login */}
+          <Link to="/auth?tab=login">
             <Button
               size="lg"
               className="animate-pulse bg-[#10B981] px-12 py-8 text-2xl font-bold text-white shadow-2xl transition-all hover:scale-110 hover:bg-[#0A0480]"
@@ -345,7 +152,8 @@ export default function Landing() {
               Iniciar Sesión
             </Button>
           </Link>
-          <Link to="/registro" className="ml-4">
+          {/* ← CAMBIO: Link a /auth con tab=register */}
+          <Link to="/auth?tab=register" className="ml-4">
             <Button
               size="lg"
               variant="outline"
