@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";  // ← Agregado: Para clases condicionales
 import { DashboardHeader } from "@/components/dashboard-header";
 import { DashboardSidebar } from "@/components/dashboard-sidebar";
 import { DashboardFooter } from "@/components/dashboard-footer";
@@ -11,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { FileText, Save, Send, Bell, CheckCircle2 } from "lucide-react";
+import { FileText, Save, Send, Bell, CheckCircle2, Loader2 } from "lucide-react";  // ← Agregado Loader2
 import { QRGenerator } from "@/components/qr-generator";
 import { generateFolio, generateQRData } from "@/lib/folio-generator";
 
@@ -21,7 +22,8 @@ const sidebarItems = [
   { label: "Notificaciones", href: "/solicitante/notificaciones", icon: "🔔" },
 ];
 
-const tramites = [
+// Datos hardcodeados, pero con loader simulado
+const initialTramites = [
   {
     id: "COM-202501-0001",
     tipo: "Solicitud de Compra",
@@ -33,7 +35,7 @@ const tramites = [
   { id: "VAC-202501-0003", tipo: "Vacaciones", estado: "Pendiente", fecha: "2025-01-10", qr: "VAC-202501-0003" },
 ];
 
-const notificaciones = [
+const initialNotificaciones = [
   { id: 1, mensaje: "Tu solicitud COM-202501-0001 está en revisión", tipo: "info", folio: "COM-202501-0001" },
   { id: 2, mensaje: "Tu reembolso REM-202501-0002 fue aprobado", tipo: "success", folio: "REM-202501-0002" },
   {
@@ -45,26 +47,49 @@ const notificaciones = [
 ];
 
 export default function SolicitantePanel() {
-  const [currentSection, setCurrentSection] = useState("crear"); // Default a primera sección
+  const [currentSection, setCurrentSection] = useState("crear");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);  // ← NUEVO: Mobile sidebar
   const [titulo, setTitulo] = useState("");
   const [tipo, setTipo] = useState("");
   const [contenido, setContenido] = useState("");
   const [folio, setFolio] = useState("");
   const [qrData, setQrData] = useState("");
   const [showQR, setShowQR] = useState(false);
+  const [tramites, setTramites] = useState(initialTramites);  // ← Con setter pa' loader
+  const [notificaciones, setNotificaciones] = useState(initialNotificaciones);  // ← Con setter
+  const [loading, setLoading] = useState(true);  // ← NUEVO: Loader
+  const [error, setError] = useState<string | null>(null);
 
-  // Mapeo tipado como Record<string, string> para evitar error de indexación
+  // ← NUEVO: Fetch simulado pa' datos
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        await new Promise(resolve => setTimeout(resolve, 1500));  // Simula API
+        setTramites(initialTramites);
+        setNotificaciones(initialNotificaciones);
+        console.log("Datos de solicitante cargados (simulado)");
+      } catch (err) {
+        setError("Error al cargar datos: " + (err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   const sectionMap: Record<string, string> = {
     "Crear Trámite": "crear",
     "Mis Trámites": "tramites",
     "Notificaciones": "notificaciones",
   };
 
-  // handleSectionChange: Asume que DashboardSidebar llama esto con el label
   const handleSectionChange = (label: string, e: React.MouseEvent) => {
-    e.preventDefault();  // ← FIX: Bloquea navegación real del href
+    e.preventDefault();
     const section = sectionMap[label] || "crear";
     setCurrentSection(section);
+    if (window.innerWidth < 1024) setIsSidebarOpen(false);  // ← Cierra sidebar en mobile
   };
 
   const handleTipoChange = (value: string) => {
@@ -96,6 +121,8 @@ export default function SolicitantePanel() {
       setShowQR(false);
     }, 3000);
   };
+
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   const renderCrearTramite = () => (
     <Card className="animate-in fade-in slide-in-from-bottom-4 border-2 border-[#3B82F6]/20 shadow-xl duration-700">
@@ -208,48 +235,58 @@ export default function SolicitantePanel() {
         <CardTitle className="text-2xl text-[#10B981]">Mis Trámites</CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-b-2">
-              <TableHead className="font-bold">Folio</TableHead>
-              <TableHead className="font-bold">Tipo</TableHead>
-              <TableHead className="font-bold">Estado</TableHead>
-              <TableHead className="font-bold">Fecha</TableHead>
-              <TableHead className="font-bold">QR</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tramites.map((tramite, index) => (
-              <TableRow
-                key={tramite.id}
-                className="animate-in fade-in border-b transition-all hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent hover:shadow-md duration-300"
-                style={{ animationDelay: `${index * 100}ms` } as React.CSSProperties}
-              >
-                <TableCell className="font-bold text-gray-900">{tramite.id}</TableCell>
-                <TableCell className="font-medium">{tramite.tipo}</TableCell>
-                <TableCell>
-                  <Badge
-                    className={`shadow-md ${
-                      tramite.estado === "Aprobado"
-                        ? "bg-green-500 text-white"
-                        : tramite.estado === "En Revisión"
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-500 text-white"
-                    }`}
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-green-500" />
+          </div>
+        ) : error ? (
+          <p className="text-red-500 text-center">{error}</p>
+        ) : (
+          <div className="overflow-x-auto w-full">  {/* ← FIX: Responsive scroll */}
+            <Table>
+              <TableHeader>
+                <TableRow className="border-b-2">
+                  <TableHead className="font-bold">Folio</TableHead>
+                  <TableHead className="font-bold">Tipo</TableHead>
+                  <TableHead className="font-bold">Estado</TableHead>
+                  <TableHead className="font-bold">Fecha</TableHead>
+                  <TableHead className="font-bold">QR</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {tramites.map((tramite, index) => (
+                  <TableRow
+                    key={tramite.id}
+                    className="animate-in fade-in border-b transition-all hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent hover:shadow-md duration-300"
+                    style={{ animationDelay: `${index * 100}ms` } as React.CSSProperties}
                   >
-                    {tramite.estado}
-                  </Badge>
-                </TableCell>
-                <TableCell className="font-medium text-gray-600">{tramite.fecha}</TableCell>
-                <TableCell>
-                  <div className="rounded-lg bg-gray-50 p-2 shadow-inner transition-all hover:scale-110 hover:shadow-lg">
-                    <QRGenerator value={generateQRData(tramite.qr, tramite.tipo, tramite.fecha)} size={48} />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                    <TableCell className="font-bold text-gray-900">{tramite.id}</TableCell>
+                    <TableCell className="font-medium">{tramite.tipo}</TableCell>
+                    <TableCell>
+                      <Badge
+                        className={`shadow-md ${
+                          tramite.estado === "Aprobado"
+                            ? "bg-green-500 text-white"
+                            : tramite.estado === "En Revisión"
+                              ? "bg-blue-500 text-white"
+                              : "bg-gray-500 text-white"
+                        }`}
+                      >
+                        {tramite.estado}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="font-medium text-gray-600">{tramite.fecha}</TableCell>
+                    <TableCell>
+                      <div className="rounded-lg bg-gray-50 p-2 shadow-inner transition-all hover:scale-110 hover:shadow-lg">
+                        <QRGenerator value={generateQRData(tramite.qr, tramite.tipo, tramite.fecha)} size={48} />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -263,28 +300,36 @@ export default function SolicitantePanel() {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6 space-y-4">
-        {notificaciones.map((notif) => (
-          <div
-            key={notif.id}
-            className={`flex items-start gap-4 rounded-xl p-4 shadow-sm ${
-              notif.tipo === "success"
-                ? "bg-green-50 border-l-4 border-green-400"
-                : notif.tipo === "warning"
-                  ? "bg-yellow-50 border-l-4 border-yellow-400"
-                  : "bg-blue-50 border-l-4 border-blue-400"
-            }`}
-          >
-            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${
-              notif.tipo === "success" ? "bg-green-500" : notif.tipo === "warning" ? "bg-yellow-500" : "bg-blue-500"
-            }`}>
-              <CheckCircle2 className="h-5 w-5 text-white" />
-            </div>
-            <div className="flex-1">
-              <p className="font-medium text-gray-900">{notif.mensaje}</p>
-              <p className="text-sm text-gray-600">Folio: {notif.folio}</p>
-            </div>
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-green-500" />
           </div>
-        ))}
+        ) : error ? (
+          <p className="text-red-500 text-center">{error}</p>
+        ) : (
+          notificaciones.map((notif) => (
+            <div
+              key={notif.id}
+              className={`flex flex-col sm:flex-row items-start gap-4 rounded-xl p-4 shadow-sm ${
+                notif.tipo === "success"
+                  ? "bg-green-50 border-l-4 border-green-400"
+                  : notif.tipo === "warning"
+                    ? "bg-yellow-50 border-l-4 border-yellow-400"
+                    : "bg-blue-50 border-l-4 border-blue-400"
+              }`}
+            >
+              <div className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                notif.tipo === "success" ? "bg-green-500" : notif.tipo === "warning" ? "bg-yellow-500" : "bg-blue-500"
+              }`}>
+                <CheckCircle2 className="h-5 w-5 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-900">{notif.mensaje}</p>
+                <p className="text-sm text-gray-600">Folio: {notif.folio}</p>
+              </div>
+            </div>
+          ))
+        )}
       </CardContent>
     </Card>
   );
@@ -304,16 +349,21 @@ export default function SolicitantePanel() {
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-50 via-white to-green-50/20">
-      <DashboardHeader userName="Solicitante" role="Rol: Solicitante" />
+      <DashboardHeader userName="Solicitante" role="Rol: Solicitante" onMenuToggle={toggleSidebar} />
       <div className="flex flex-1">
         <DashboardSidebar 
-          items={sidebarItems.map((item, _index) => ({  // ← FIX: Index para key única
+          items={sidebarItems.map((item) => ({
             ...item,
-            onClick: (e: React.MouseEvent) => handleSectionChange(item.label, e)  // ← FIX: preventDefault en onClick
+            onClick: (e: React.MouseEvent) => handleSectionChange(item.label, e)
           }))} 
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}  // ← Agregado pa' mobile
         />
-        <main className="flex-1 p-6 overflow-y-auto">
-          <div className="mx-auto max-w-6xl space-y-6">
+        <main className={cn(  // ← Usando cn pa' responsive
+          "flex-1 transition-all duration-300 p-2 sm:p-4 lg:p-6 overflow-y-auto w-full",
+          isSidebarOpen ? "lg:ml-0 ml-0" : "ml-0"
+        )}>
+          <div className="mx-auto max-w-6xl space-y-6 w-full">
             {renderSection()}
           </div>
         </main>

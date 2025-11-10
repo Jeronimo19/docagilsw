@@ -70,7 +70,7 @@ export default function Landing() {
             textShadow: "2px 2px 4px rgba(0,0,0,0.5)"
           }}
         >
-          DocAgil: Flujo de Aprobaciones y Control de Documentos Internos
+          Dart
         </h1>
           <p className="mb-8 text-2xl font-medium text-[#FFFFFF] md:text-3xl">
             Automatiza tus documentos internos y reduce tiempos en 50%
